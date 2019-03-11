@@ -8,6 +8,7 @@ namespace Elfin.Toolkits.Tools
 {
     /// <summary>
     /// 文件输入输出辅助类
+    /// PS: 迁移至 Elfin.IO.File
     /// </summary>
     public class FileIOHelper
     {
