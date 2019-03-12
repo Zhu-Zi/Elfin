@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Elfin.Core.Builders;
+using Elfin.Core.Models;
 using Elfin.IO.Common;
 using Elfin.IO.Files;
+using Elfin.IO.Models;
 
 namespace Elfin.IO.CSV
 {
@@ -16,14 +19,42 @@ namespace Elfin.IO.CSV
         /// 读取指定路径的CSV文件
         /// </summary>
         /// <param name="path"></param>
-        public void ReadCSVFile(string path)
+        public List<object> ReadCSVFile(string path)
         {
+            var resutl = new List<object>();
             var commentsInfoList = new List<string>();
-            var csvFieldList = new List<string>();
+            var csvFieldModel = new CSVFieldModel();
             //// 按照行读取指定路径下的 CSV 文件
             var lineList = FileIOHelper.ReadFile(path);
 
-            csvFieldList = GetCSVFieldList(lineList);
+            csvFieldModel = GetCSVFieldModel(lineList);
+
+            if (csvFieldModel.CSVFieldList.Count > 0)
+            {
+                //// 移除CSV文件中非数据的行
+                lineList.RemoveRange(0, csvFieldModel.FieldLineIndex);
+
+                var myObject = ElfinTypeBuilder.CreateNewObject(csvFieldModel.CSVFieldList);
+
+                foreach (var line in lineList)
+                {
+                    var isSC = StringHelper.IsSingleLineComments(line);
+
+                    if (!isSC)
+                    {
+                        var dataList = line.Split(",").ToList();
+
+                        for (int i = 0; i < dataList.Count; i++)
+                        {
+                            myObject.GetType().GetProperty(csvFieldModel.CSVFieldList[i].FieldName).SetValue(myObject, dataList[i]);
+                        }
+
+                        resutl.Add(myObject);
+                    }
+                }
+            }
+
+            return resutl;
         }
 
         #region Private Functions
@@ -33,10 +64,10 @@ namespace Elfin.IO.CSV
         /// </summary>
         /// <param name="lineList">行集合</param>
         /// <returns>CSV文件字段集合</returns>
-        private List<string> GetCSVFieldList(List<string> lineList)
+        private CSVFieldModel GetCSVFieldModel(List<string> lineList)
         {
             var commentsInfoList = new List<string>();
-            var csvFieldList = new List<string>();
+            var csvFieldModel = new CSVFieldModel();
 
             //// 寻找文件字段
             foreach (var line in lineList)
@@ -59,16 +90,23 @@ namespace Elfin.IO.CSV
                     //// 当某一行与后两行通过","分割后的节点数量一致，则认定改行为字段名行
                     if (splitLineCount == splitNext1LineCount && splitLineCount == splitNext2LineCount)
                     {
-                        csvFieldList = line.Split(",").ToList();
+                        csvFieldModel.FieldLineIndex = lineIndex;
+                        var fieldNameList = line.Split(",").ToList();
+
+                        foreach (var name in fieldNameList)
+                        {
+                            csvFieldModel.CSVFieldList.Add(new FieldModel { FieldName = name, FieldType = typeof(string) });
+                        }
+
                         break;
                     }
                 }
             }
 
-            return csvFieldList;
+            return csvFieldModel;
         }
 
-        
+
 
         #endregion
     }
