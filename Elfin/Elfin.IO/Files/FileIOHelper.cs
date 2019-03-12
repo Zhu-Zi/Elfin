@@ -125,15 +125,23 @@ namespace Elfin.IO.Files
         public static List<string> ReadFile(string path)
         {
             var linelist = new List<string>();
-            var sr = new StreamReader(path, Encoding.Default);
-            var line = "";
 
-            while (!string.IsNullOrEmpty(line = sr.ReadLine()))
+            try
             {
-                linelist.Add(line);
-            }
+                var sr = new StreamReader(path, Encoding.Default);
+                var line = "";
 
-            sr.Close();
+                while (!string.IsNullOrEmpty(line = sr.ReadLine()))
+                {
+                    linelist.Add(line);
+                }
+
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return linelist;
         }

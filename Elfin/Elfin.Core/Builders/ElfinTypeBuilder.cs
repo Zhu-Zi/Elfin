@@ -16,8 +16,17 @@ namespace Elfin.Core.Builders
         /// <returns>object类型对象</returns>
         public static object CreateNewObject(List<FieldModel> fieldList)
         {
-            var myType = CompileResultType(fieldList);
-            var myObject = Activator.CreateInstance(myType);
+            var myObject = new object();
+
+            try
+            {
+                var myType = CompileResultType(fieldList);
+                myObject = Activator.CreateInstance(myType);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return myObject;
         }

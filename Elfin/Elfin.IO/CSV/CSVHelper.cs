@@ -19,7 +19,7 @@ namespace Elfin.IO.CSV
         /// 读取指定路径的CSV文件
         /// </summary>
         /// <param name="path"></param>
-        public List<object> ReadCSVFile(string path)
+        public static List<object> ReadCSVFile(string path)
         {
             var resutl = new List<object>();
             var commentsInfoList = new List<string>();
@@ -64,7 +64,7 @@ namespace Elfin.IO.CSV
         /// </summary>
         /// <param name="lineList">行集合</param>
         /// <returns>CSV文件字段集合</returns>
-        private CSVFieldModel GetCSVFieldModel(List<string> lineList)
+        private static CSVFieldModel GetCSVFieldModel(List<string> lineList)
         {
             var commentsInfoList = new List<string>();
             var csvFieldModel = new CSVFieldModel();
@@ -84,8 +84,8 @@ namespace Elfin.IO.CSV
                     var next1Line = lineList[lineIndex + 1];
                     var next2Line = lineList[lineIndex + 2];
                     var splitLineCount = line.Split(",").Count();
-                    var splitNext1LineCount = line.Split(",").Count();
-                    var splitNext2LineCount = line.Split(",").Count();
+                    var splitNext1LineCount = next1Line.Split(",").Count();
+                    var splitNext2LineCount = next2Line.Split(",").Count();
 
                     //// 当某一行与后两行通过","分割后的节点数量一致，则认定改行为字段名行
                     if (splitLineCount == splitNext1LineCount && splitLineCount == splitNext2LineCount)
@@ -105,8 +105,6 @@ namespace Elfin.IO.CSV
 
             return csvFieldModel;
         }
-
-
 
         #endregion
     }
