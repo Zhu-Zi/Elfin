@@ -67,9 +67,9 @@ namespace Elfin.IO.Files
         /// Create target file
         /// 创建目标文件
         /// </summary>
-        /// <param name="folder">folder</param>
-        /// <param name="fileName">folder name</param>
-        /// <param name="fileExtension">file extension</param>
+        /// <param name="folder">文件路径</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="fileExtension">文件扩展名</param>
         /// <returns>file path</returns>
         public static string CreateFile(string folder, string fileName, string fileExtension)
         {

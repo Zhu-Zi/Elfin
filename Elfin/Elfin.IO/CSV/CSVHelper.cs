@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Elfin.Core.Builders;
@@ -57,6 +58,27 @@ namespace Elfin.IO.CSV
             return resutl;
         }
 
+        /// <summary>
+        /// 数据写入CSV文件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="folderPath">文件路径</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="dataList">数据集合</param>
+        /// <returns>方法是否执行成功</returns>
+        public static bool WriteCSVFile<T>(string folderPath, string fileName, List<T> dataList)
+        {
+            var isSuccess = false;
+
+            if (!string.IsNullOrEmpty(folderPath) && !string.IsNullOrEmpty(fileName) && dataList != null && dataList.Count > 0)
+            {
+                var filePath = FileIOHelper.CreateFile(folderPath, fileName, "csv");
+                isSuccess = WriteCSV(filePath, dataList);
+            }
+
+            return isSuccess;
+        }
+
         #region Private Functions
 
         /// <summary>
@@ -104,6 +126,76 @@ namespace Elfin.IO.CSV
             }
 
             return csvFieldModel;
+        }
+
+        /// <summary>
+        /// 写CSV方法
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="filePath">CSV文件路径</param>
+        /// <param name="dataList">数据集合</param>
+        /// <returns></returns>
+        private static bool WriteCSV<T>(string filePath, List<T> dataList)
+        {
+            var isSuccess = false;
+            StreamWriter sw = null;
+
+            try
+            {
+                var typeList = typeof(T).GetProperties();
+                var lastType = typeList.Last();
+                var strColumn = new StringBuilder();
+                var strValue = new StringBuilder();
+
+                sw = new StreamWriter(filePath);
+
+                //// 设置列头
+                foreach (var type in typeList)
+                {
+                    strColumn.Append(type.Name);
+
+                    if (type != lastType)
+                    {
+                        strColumn.Append(",");
+                    }
+                }
+
+                strColumn.Remove(strColumn.Length - 1, 1);
+                sw.WriteLine(strColumn);//// 写入列名
+
+                //// 按行写入数据
+                foreach (var item in dataList)
+                {
+                    strValue.Remove(0, strValue.Length);//// 清除临时行值 clear the temp row value
+
+                    foreach (var type in typeList)
+                    {
+                        strValue.Append(item.GetType().GetProperty(type.Name).GetValue(item));
+
+                        if (type != lastType)
+                        {
+                            strValue.Append(",");
+                        }
+                    }
+
+                    sw.WriteLine(strValue);//// 写入行数据
+                }
+
+                isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (sw != null)
+                {
+                    sw.Dispose();
+                }
+            }
+
+            return isSuccess;
         }
 
         #endregion
