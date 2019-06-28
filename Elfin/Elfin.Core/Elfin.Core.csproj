@@ -4,8 +4,4 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Elfin.Core\Elfin.Core.csproj" />
-  </ItemGroup>
-
 </Project>

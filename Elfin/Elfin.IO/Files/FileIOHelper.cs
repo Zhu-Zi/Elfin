@@ -67,9 +67,9 @@ namespace Elfin.IO.Files
         /// Create target file
         /// 创建目标文件
         /// </summary>
-        /// <param name="folder">folder</param>
-        /// <param name="fileName">folder name</param>
-        /// <param name="fileExtension">file extension</param>
+        /// <param name="folder">文件路径</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="fileExtension">文件扩展名</param>
         /// <returns>file path</returns>
         public static string CreateFile(string folder, string fileName, string fileExtension)
         {
@@ -125,15 +125,23 @@ namespace Elfin.IO.Files
         public static List<string> ReadFile(string path)
         {
             var linelist = new List<string>();
-            var sr = new StreamReader(path, Encoding.Default);
-            var line = "";
 
-            while (!string.IsNullOrEmpty(line = sr.ReadLine()))
+            try
             {
-                linelist.Add(line);
-            }
+                var sr = new StreamReader(path, Encoding.Default);
+                var line = "";
 
-            sr.Close();
+                while (!string.IsNullOrEmpty(line = sr.ReadLine()))
+                {
+                    linelist.Add(line);
+                }
+
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return linelist;
         }
